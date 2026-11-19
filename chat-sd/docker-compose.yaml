@@ -1,0 +1,165 @@
+x-python: &python
+  build:
+    context: .
+    dockerfile: python/Dockerfile
+  image: chat-python
+
+x-js: &js
+  build:
+    context: .
+    dockerfile: js/Dockerfile
+  image: chat-js
+
+x-java: &java
+  build:
+    context: .
+    dockerfile: java/Dockerfile
+  image: chat-java
+
+services:
+  broker:
+    <<: *python
+    command: python broker.py
+
+  proxy:
+    <<: *js
+    command: node proxy.js
+
+  referencia:
+    <<: *java
+    command: ["java", "-cp", "target/classes:lib/*", "Referencia"]
+
+  servidor-py-1:
+    <<: *python
+    command: python servidor.py
+    environment:
+      NOME: servidor-py-1
+    volumes:
+      - ./dados:/dados
+    depends_on:
+      - broker
+      - proxy
+      - referencia
+
+  bot-py-1:
+    <<: *python
+    command: python cliente.py
+    environment:
+      NOME: bot-py-1
+    depends_on:
+      - servidor-py-1
+
+  servidor-py-2:
+    <<: *python
+    command: python servidor.py
+    environment:
+      NOME: servidor-py-2
+    volumes:
+      - ./dados:/dados
+    depends_on:
+      - broker
+      - proxy
+      - referencia
+
+  bot-py-2:
+    <<: *python
+    command: python cliente.py
+    environment:
+      NOME: bot-py-2
+    depends_on:
+      - servidor-py-1
+      - servidor-py-2
+
+  servidor-js-1:
+    <<: *js
+    command: node servidor.js
+    environment:
+      NOME: servidor-js-1
+    volumes:
+      - ./dados:/dados
+    depends_on:
+      - broker
+      - proxy
+      - referencia
+
+  bot-js-1:
+    <<: *js
+    command: node cliente.js
+    environment:
+      NOME: bot-js-1
+    depends_on:
+      - servidor-py-1
+      - servidor-py-2
+      - servidor-js-1
+
+  servidor-js-2:
+    <<: *js
+    command: node servidor.js
+    environment:
+      NOME: servidor-js-2
+    volumes:
+      - ./dados:/dados
+    depends_on:
+      - broker
+      - proxy
+      - referencia
+
+  bot-js-2:
+    <<: *js
+    command: node cliente.js
+    environment:
+      NOME: bot-js-2
+    depends_on:
+      - servidor-py-1
+      - servidor-py-2
+      - servidor-js-1
+      - servidor-js-2
+
+  servidor-java-1:
+    <<: *java
+    command: ["java", "-cp", "target/classes:lib/*", "Servidor"]
+    environment:
+      NOME: servidor-java-1
+    volumes:
+      - ./dados:/dados
+    depends_on:
+      - broker
+      - proxy
+      - referencia
+
+  bot-java-1:
+    <<: *java
+    command: ["java", "-cp", "target/classes:lib/*", "Cliente"]
+    environment:
+      NOME: bot-java-1
+    depends_on:
+      - servidor-py-1
+      - servidor-py-2
+      - servidor-js-1
+      - servidor-js-2
+      - servidor-java-1
+
+  servidor-java-2:
+    <<: *java
+    command: ["java", "-cp", "target/classes:lib/*", "Servidor"]
+    environment:
+      NOME: servidor-java-2
+    volumes:
+      - ./dados:/dados
+    depends_on:
+      - broker
+      - proxy
+      - referencia
+
+  bot-java-2:
+    <<: *java
+    command: ["java", "-cp", "target/classes:lib/*", "Cliente"]
+    environment:
+      NOME: bot-java-2
+    depends_on:
+      - servidor-py-1
+      - servidor-py-2
+      - servidor-js-1
+      - servidor-js-2
+      - servidor-java-1
+      - servidor-java-2

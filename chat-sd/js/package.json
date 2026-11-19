@@ -1,0 +1,9 @@
+{
+  "name": "chat-js",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "protobufjs": "^7.2.6",
+    "zeromq": "^6.0.0"
+  }
+}

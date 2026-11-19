@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package chat;
+
+option java_package = "chat";
+option java_multiple_files = true;
+
+message InfoServidor {
+  string nome = 1;
+  int32 rank = 2;
+}
+
+message Registro {
+  string tipo = 1;
+  string usuario = 2;
+  string canal = 3;
+  string texto = 4;
+  double timestamp = 5;
+  string servidor = 6;
+  int32 relogio = 7;
+}
+
+message Msg {
+  string tipo = 1;
+  string de = 2;
+  double timestamp = 3;
+  int32 relogio = 4;
+  string usuario = 5;
+  string canal = 6;
+  string texto = 7;
+  string status = 8;
+  string erro = 9;
+  repeated string canais = 10;
+  repeated InfoServidor servidores = 11;
+  int32 rank = 12;
+  double hora = 13;
+  string coordenador = 14;
+  Registro registro = 15;
+  repeated Registro registros = 16;
+}
